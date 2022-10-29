@@ -25,7 +25,8 @@ async function init() {
 
 
     const player = new Clappr.Player({
-        source: 'https://streamspace.live/hls/jptv/livestream.m3u8',
+        // source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        source: 'https://streamspace.live/hls/eachone/teachone.m3u8',
         autoPlay: true,
         mute: false,
         plugins: [
@@ -50,13 +51,22 @@ async function init() {
         canvas.height = clapper_player.offsetHeight;
 
         ctx = canvas.getContext('2d');
-        // window.requestAnimationFrame(loop);
+        window.requestAnimationFrame(loop);
     });
 
     player.on('play', function () {
-        while (true) {
-            loop();
+        video = document.querySelector('#clapper_player video');
+
+        video.crossOrigin = "anonymous";
+        if (!canvas) {
+            canvas = document.createElement('canvas');
         }
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        document.body.append(canvas);
+
+        window.requestAnimationFrame(loop);
     });
 
 
@@ -69,16 +79,23 @@ async function init() {
 }
 
 async function loop() {
-    ctx.drawImage(video, 0, 0);
-    console.log('loop');
-    await predict();
+    ctx = canvas.getContext('2d');
+    try {
+        ctx.drawImage(video, 0, 0);
+        await predict();
+    } catch (f){
+        console.log(f);
+    }
     // window.requestAnimationFrame(loop);
 }
 
 // run the webcam image through the image model
 async function predict() {
     // predict can take in an image, video or canvas html element
-    const prediction = await model.predict(canvas);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = canvas.toDataURL();;
+    const prediction = await model.predict(img);
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction =
             prediction[i].className + ": " + prediction[i].probability.toFixed(2);
