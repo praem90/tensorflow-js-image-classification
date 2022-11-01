@@ -25,8 +25,8 @@ async function init() {
 
     const player = new Clappr.Player({
         // source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        source: 'https://streamspace.live/hls/jptv/livestream.m3u8',
-        // source: 'https://streamspace.live/hls/eachone/teachone.m3u8',
+        // source: 'https://streamspace.live/hls/jptv/livestream.m3u8',
+        source: 'https://streamspace.live/hls/eachone/teachone.m3u8',
         autoPlay: true,
         mute: false,
         plugins: [
