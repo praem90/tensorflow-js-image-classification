@@ -60,9 +60,7 @@ async function init() {
 
         ctx = canvas.getContext('2d');
 
-        setTimeout(() => {
-            window.requestAnimationFrame(loop);
-        }, 2000);
+    window.requestAnimationFrame(loop);
     });
 
     // append elements to the DOM
@@ -79,7 +77,9 @@ async function loop() {
     } catch (f){
         console.log(f);
     }
-    window.requestAnimationFrame(loop);
+        setTimeout(() => {
+            window.requestAnimationFrame(loop);
+        }, 2000);
 }
 
 // run the webcam image through the image model
