@@ -60,7 +60,9 @@ async function init() {
 
         ctx = canvas.getContext('2d');
 
-        window.requestAnimationFrame(loop);
+        setTimeout(() => {
+            window.requestAnimationFrame(loop);
+        }, 2000);
     });
 
     // append elements to the DOM
