@@ -25,8 +25,8 @@ async function init() {
 
     const player = new Clappr.Player({
         // source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        // source: 'https://streamspace.live/hls/jptv/livestream.m3u8',
-        source: 'https://streamspace.live/hls/eachone/teachone.m3u8',
+        source: 'https://streamspace.live/hls/jptv/livestream.m3u8',
+        // source: 'https://streamspace.live/hls/eachone/teachone.m3u8',
         autoPlay: true,
         mute: false,
         plugins: [
@@ -60,13 +60,15 @@ async function init() {
 
         ctx = canvas.getContext('2d');
 
-    window.requestAnimationFrame(loop);
+            window.requestAnimationFrame(loop);
     });
 
     // append elements to the DOM
     labelContainer = document.getElementById("label-container");
     for (let i = 0; i < maxPredictions; i++) { // and class labels
-        labelContainer.appendChild(document.createElement("div"));
+        const label = document.createElement('div');
+        label.innerHTML = renderLabel(i, {probability: 0});
+        labelContainer.appendChild(label);
     }
 }
 
@@ -87,10 +89,37 @@ async function predict() {
     // predict can take in an image, video or canvas html element
     const prediction = await model.predict(canvas);
     for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction =
-            prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-        labelContainer.childNodes[i].innerHTML = classPrediction;
+        labelContainer.childNodes[i].innerHTML = renderLabel(i, prediction[i]);
     }
 }
 
+function renderLabel(i, prediction) {
+    const colors = [
+        'pink',
+        'amber',
+        'blue',
+        'red',
+        'green',
+    ];
 
+    const probability = prediction.probability.toFixed(2) * 100;
+    let content = `<div class="relative pt-1">
+  <div class="flex mb-2 items-center justify-between">
+    <div>
+      <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-${colors[i]}-600">
+        ${prediction.className ||  ''}
+      </span>
+    </div>
+    <div class="text-right">
+      <span class="text-xs font-semibold inline-block text-${colors[i]}-600">
+        ${probability}%
+      </span>
+    </div>
+  </div>
+  <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-${colors[i]}-200">
+    <div style="width:${probability}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-${colors[i]}-500"></div>
+  </div>
+</div>`;
+
+    return content;
+}
