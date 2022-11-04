@@ -90,8 +90,10 @@ async function predict() {
     let predictions = await model.predict(canvas);
 
     predictions.sort((a,b) => {
-        a.probability - b.probability;
+        return b.probability - a.probability;
     });
+
+    console.log(predictions);
     // for (let i = 0; i < maxPredictions; i++) {
     //     labelContainer.childNodes[i].innerHTML = renderLabel(i, prediction[i]);
     // }
@@ -103,7 +105,7 @@ function renderLabel(i, prediction) {
         'green',
     ];
 
-    const probability = prediction.probability.toFixed(2) * 100;
+    const probability = ( prediction.probability * 100 ).toFixed(2);
     let content = `<div class="relative pt-1">
   <div class="flex mb-2 items-center justify-between">
     <div>
