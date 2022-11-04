@@ -87,11 +87,15 @@ async function loop() {
 // run the webcam image through the image model
 async function predict() {
     // predict can take in an image, video or canvas html element
-    const prediction = await model.predict(canvas);
+    let predictions = await model.predict(canvas);
+
+    predictions.sort((a,b) => {
+        a.probability - b.probability;
+    });
     // for (let i = 0; i < maxPredictions; i++) {
     //     labelContainer.childNodes[i].innerHTML = renderLabel(i, prediction[i]);
     // }
-        labelContainer.childNodes[0].innerHTML = renderLabel(0, prediction[0]);
+        labelContainer.childNodes[0].innerHTML = renderLabel(0, predictions[0]);
 }
 
 function renderLabel(i, prediction) {
