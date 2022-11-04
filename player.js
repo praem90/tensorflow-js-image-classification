@@ -67,7 +67,7 @@ async function init() {
     labelContainer = document.getElementById("label-container");
     for (let i = 0; i < maxPredictions; i++) { // and class labels
         const label = document.createElement('div');
-        label.innerHTML = renderLabel(i, {probability: 0});
+        label.innerHTML = '';
         labelContainer.appendChild(label);
     }
 }
@@ -88,17 +88,14 @@ async function loop() {
 async function predict() {
     // predict can take in an image, video or canvas html element
     const prediction = await model.predict(canvas);
-    for (let i = 0; i < maxPredictions; i++) {
-        labelContainer.childNodes[i].innerHTML = renderLabel(i, prediction[i]);
-    }
+    // for (let i = 0; i < maxPredictions; i++) {
+    //     labelContainer.childNodes[i].innerHTML = renderLabel(i, prediction[i]);
+    // }
+        labelContainer.childNodes[0].innerHTML = renderLabel(0, prediction[0]);
 }
 
 function renderLabel(i, prediction) {
     const colors = [
-        'pink',
-        'amber',
-        'blue',
-        'red',
         'green',
     ];
 
