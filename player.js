@@ -89,15 +89,16 @@ async function predict() {
     // predict can take in an image, video or canvas html element
     let predictions = await model.predict(canvas);
 
-    predictions.sort((a,b) => {
-        return b.probability - a.probability;
-    });
+    const maxIndex = predictions.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
 
-    console.log(predictions);
+    // predictions.sort((a,b) => {
+    //     return b.probability - a.probability;
+    // });
+
     // for (let i = 0; i < maxPredictions; i++) {
     //     labelContainer.childNodes[i].innerHTML = renderLabel(i, prediction[i]);
     // }
-        labelContainer.childNodes[0].innerHTML = renderLabel(0, predictions[0]);
+        labelContainer.childNodes[0].innerHTML = renderLabel(maxIndex, predictions[maxIndex]);
 }
 
 function renderLabel(i, prediction) {
@@ -107,18 +108,14 @@ function renderLabel(i, prediction) {
 
     const probability = ( prediction.probability * 100 ).toFixed(2);
     let content = `<div class="relative pt-1">
-  <div class="flex mb-2 items-center justify-between">
     <div>
-      <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-${colors[i]}-600">
+      <h2 class="text-2xl font-semibold  uppercase rounded-full text-green-600 text-${colors[i]}-600">
         ${prediction.className ||  ''}
-      </span>
-    </div>
-    <div class="text-right">
-      <span class="text-xs font-semibold inline-block text-${colors[i]}-600">
+      </h2>
+      <span class="text-lg font-semibold inline-block text-${colors[i]}-600">
         ${probability}%
       </span>
     </div>
-  </div>
   <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-${colors[i]}-200">
     <div style="width:${probability}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-${colors[i]}-500"></div>
   </div>
