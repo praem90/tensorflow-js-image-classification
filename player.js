@@ -89,7 +89,7 @@ async function predict() {
     // predict can take in an image, video or canvas html element
     let predictions = await model.predict(canvas);
 
-    const maxIndex = predictions.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+    const maxIndex = predictions.map(p => p.probability).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
 
     // predictions.sort((a,b) => {
     //     return b.probability - a.probability;
