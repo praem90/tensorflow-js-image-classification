@@ -1,7 +1,7 @@
 import "@tensorflow/tfjs";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 
-let modelPromise, video, canvas, ctx;
+let modelPromise, video, canvas, ctx, labelContainer;
 
 window.onload = init;
 
@@ -9,9 +9,12 @@ window.onload = init;
 async function init() {
     
     modelPromise = cocoSsd.load();
+    canvas = document.getElementById('preview');
+    labelContainer = document.getElementById("label-container");
+
 
     const player = new Clappr.Player({
-        source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        source: '/BigBuckBunny.mp4',
         // source: 'https://streamspace.live/hls/jptv/livestream.m3u8',
         // source: 'https://ce6f091ea3c5.us-west-2.playback.live-video.net/api/video/v1/us-west-2.409979216872.channel.p55JDUTJwMKL.m3u8',
         autoPlay: true,
@@ -64,7 +67,7 @@ async function init() {
 
         ctx = canvas.getContext('2d');
 
-            window.requestAnimationFrame(loop);
+        window.requestAnimationFrame(loop);
     });
 }
 
@@ -77,18 +80,31 @@ async function loop() {
     }
         setTimeout(() => {
             window.requestAnimationFrame(loop);
-        }, 2000);
+        }, 1000);
 }
 
 // run the webcam image through the image model
 async function predict() {
     // predict can take in an image, video or canvas html element
     const model = await modelPromise;
-    let predictions = await model.detect(canvas);
+    let result = await model.detect(canvas);
+    const predictions = {};
+  
+    console.log('number of detections: ', result.length);
+    for (let i = 0; i < result.length; i++) {
+      if (!predictions[result[i].class]) {
+        predictions[result[i].class] = {count: 0, class: result[i].class};
+      } 
+      predictions[result[i].class].count++;
+    }
 
-    console.log(predictions);
+    labelContainer.innerHTML = '';
 
-    // labelContainer.innerHTML = renderLabel(predictions);
+    const lables = Object.keys(predictions);
+
+    for (let i = 0; i < lables.length; i++) { // and class labels
+        labelContainer.innerHTML += renderLabel(i, predictions[lables[i]]);
+    }
 }
 
 function renderLabel(i, prediction) {
@@ -100,19 +116,15 @@ function renderLabel(i, prediction) {
         'amber',
     ];
 
-    const probability = ( prediction.probability * 100 ).toFixed(2);
-    let content = `<div class="m-auto relative pt-1">
+
+    i = i%(colors.length - 1);
+    
+    let content = `<div class="pt-1">
     <div>
       <h2 class="text-6xl text-center font-semibold  uppercase rounded-full text-green-600 text-${colors[i]}-600">
-        ${prediction.className ||  ''}
+        ${prediction.class ||  ''} - ${prediction.count}
       </h2>
-      <p class="text-4xl text-center font-semibold text-${colors[i]}-600">
-        ${probability}%
-      </p>
     </div>
-  <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-${colors[i]}-200">
-    <div style="width:${probability}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-${colors[i]}-500"></div>
-  </div>
 </div>`;
 
     return content;
